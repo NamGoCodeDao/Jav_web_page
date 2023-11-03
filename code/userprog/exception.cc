@@ -67,36 +67,53 @@ void ExceptionHandler(ExceptionType which)
 			ASSERTNOTREACHED();
 			break;
 
-		case SC_Add:
-			DEBUG(dbgSys, "Add " << kernel->machine->ReadRegister(4) << " + " << kernel->machine->ReadRegister(5) << "\n");
+		case SC_Create:
+		{
+			int virtAddr;
+			char *filename;
 
-			/* Process SysAdd Systemcall*/
-			int result;
-			result = SysAdd(/* int op1 */ (int)kernel->machine->ReadRegister(4),
-							/* int op2 */ (int)kernel->machine->ReadRegister(5));
+			DEBUG(dbgSys, "\n SC_Create call ...");
+			DEBUG(dbgSys, "\n Reading virtual address of filename");
 
-			DEBUG(dbgSys, "Add returning with " << result << "\n");
-			/* Prepare Result */
-			kernel->machine->WriteRegister(2, (int)result);
+			// Lấy tham số tên tập tin từ thanh ghi r4
+			virtAddr = ReadRegister(4);
+			DEBUG(dbgSys, "\n Reading filename.");
 
-			/* Modify return point */
+			// MaxFileLength là = 32
+			filename = User2System(virtAddr, MaxFileLength + 1);
+
+			if (filename == NULL)
 			{
-				/* set previous programm counter (debugging only)*/
-				kernel->machine->WriteRegister(PrevPCReg, kernel->machine->ReadRegister(PCReg));
+				DEBUG(dbgSys, "\n Filename is not valid");
+				WriteRegister(2, -1); // trả về lỗi cho chuong trình người dùng
 
-				/* set programm counter to next instruction (all Instructions are 4 byte wide)*/
-				kernel->machine->WriteRegister(PCReg, kernel->machine->ReadRegister(PCReg) + 4);
-
-				/* set next programm counter for brach execution */
-				kernel->machine->WriteRegister(NextPCReg, kernel->machine->ReadRegister(PCReg) + 4);
 			}
+			else {
+				DEBUG(dbgSys, "\n Finish reading filename.");
+				DEBUG(dbgSys,"\n File name : '"<<filename<<"'");	
+				// Create file with size = 0
+				if  (!fileSystemCreate(filename))
+				{
+					DEBUG(dbgSys, "\n Error create file '" << filename << "'");
+					WriteRegister(2, -1);
+				}	
+				else
+				{
+					DEBUG(dbgSys, "\n Create file '" << filename << "' successfully");
+					WriteRegister(2, 0);
+				}		
+			}
+
+			delete filename;
+			ModifyReturnPC();
 
 			return;
 
 			ASSERTNOTREACHED();
 
 			break;
-
+		}
+		
 		default:
 			cerr << "Unexpected system call " << type << "\n";
 			break;
