@@ -48,6 +48,17 @@
 //	is in machine.h.
 //----------------------------------------------------------------------
 
+#define MaxFileLength 32 // Do dai quy uoc cho file name
+
+void IncreasePC()
+{
+	int counter = machine->ReadRegister(PCReg);
+   	machine->WriteRegister(PrevPCReg, counter);
+    	counter = machine->ReadRegister(NextPCReg);
+    	machine->WriteRegister(PCReg, counter);
+   	machine->WriteRegister(NextPCReg, counter + 4);
+}
+
 void ExceptionHandler(ExceptionType which)
 {
 	int type = kernel->machine->ReadRegister(2);
