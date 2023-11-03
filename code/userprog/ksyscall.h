@@ -24,7 +24,12 @@ void SysHalt()
 
 int SysAdd(int op1, int op2)
 {
-  return op1 + op2;
+    oneChar = (int)buffer[i];
+    kernel->machine->WriteMem(virtAddr + i, 1, oneChar);
+    i++;
+  } while (i < len && oneChar != 0);
+
+  return i;
 }
 
 
