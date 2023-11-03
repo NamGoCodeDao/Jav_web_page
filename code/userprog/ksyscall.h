@@ -19,10 +19,6 @@ void SysHalt()
   kernel->interrupt->Halt();
 }
 
-int SysAdd(int op1, int op2)
-{
-  return op1 + op2;
-}
 
 char *User2System(int virtAddr, int limit)
 {
@@ -68,7 +64,7 @@ int System2User(int virtAddr, int len, char *buffer)
   return i;
 }
 
-void ModifyReturnPC()
+void IncreasePC()
 {
   // set previous programm counter (debugging only)
   kernel->machine->WriteRegister(PrevPCReg, kernel->machine->ReadRegister(PCReg));
@@ -80,19 +76,42 @@ void ModifyReturnPC()
   kernel->machine->WriteRegister(NextPCReg, kernel->machine->ReadRegister(PCReg) + 4);
 }
 
-int ReadRegister(int num)
-{
-  return kernel->machine->ReadRegister(num);
-}
 
-void WriteRegister(int num, int value)
+int SysCreate(int virtAddr)
 {
-  kernel->machine->WriteRegister(num, value);
-}
+  		DEBUG(dbgSys, "\n Reading virtual address of filename");
+			char *filename;
+			// Read virtual address of filename from register 4
+			virtAddr = kernel->machine->ReadRegister(4);
+  
+			DEBUG(dbgSys, "\n Reading filename.");
+			// MaxFileLength is 32
+      int result = 0;
+			filename = User2System(virtAddr, MaxFileLength + 1);
 
-bool fileSystemCreate(char *filename)
-{
-  return kernel->fileSystem->Create(filename);
+			if (filename == NULL)
+			{
+				DEBUG(dbgSys, "\n Filename is not valid");
+				result = -1;
+			}
+			else {
+				DEBUG(dbgSys, "\n Finish reading filename.");
+				DEBUG(dbgSys,"\n File name : '"<<filename<<"'");	
+        
+				// Create file with size = 0
+				if  (!kernel->fileSystem->Create(filename))
+				{
+					DEBUG(dbgSys, "\n Error create file '" << filename << "'");
+					result = -1;
+				}	
+				else
+				{
+					DEBUG(dbgSys, "\n Create file '" << filename << "' successfully");
+				}		
+			}
+
+			delete[] filename;
+      return result;
 }
 
 #endif /* ! __USERPROG_KSYSCALL_H__ */

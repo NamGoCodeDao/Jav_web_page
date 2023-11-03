@@ -69,48 +69,18 @@ void ExceptionHandler(ExceptionType which)
 
 		case SC_Create:
 		{
-			int virtAddr;
-			char *filename;
+			int result;
 
 			DEBUG(dbgSys, "\n SC_Create call ...");
-			DEBUG(dbgSys, "\n Reading virtual address of filename");
+			result = SysCreate((int)kernel->machine->ReadRegister(4));
 
-			// Lấy tham số tên tập tin từ thanh ghi r4
-			virtAddr = ReadRegister(4);
-			DEBUG(dbgSys, "\n Reading filename.");
+			DEBUG(dbgSys, "SysCreate returning with " << result << "\n");
+            kernel->machine->WriteRegister(2, (int)result);
 
-			// MaxFileLength là = 32
-			filename = User2System(virtAddr, MaxFileLength + 1);
-
-			if (filename == NULL)
-			{
-				DEBUG(dbgSys, "\n Filename is not valid");
-				WriteRegister(2, -1); // trả về lỗi cho chuong trình người dùng
-
-			}
-			else {
-				DEBUG(dbgSys, "\n Finish reading filename.");
-				DEBUG(dbgSys,"\n File name : '"<<filename<<"'");	
-				// Create file with size = 0
-				if  (!fileSystemCreate(filename))
-				{
-					DEBUG(dbgSys, "\n Error create file '" << filename << "'");
-					WriteRegister(2, -1);
-				}	
-				else
-				{
-					DEBUG(dbgSys, "\n Create file '" << filename << "' successfully");
-					WriteRegister(2, 0);
-				}		
-			}
-
-			delete filename;
-			ModifyReturnPC();
+			IncreasePC();
 
 			return;
-
 			ASSERTNOTREACHED();
-
 			break;
 		}
 		
