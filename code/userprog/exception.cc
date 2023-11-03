@@ -79,6 +79,43 @@ void ExceptionHandler(ExceptionType which)
 
 			ASSERTNOTREACHED();
 			break;
+		case SC_CreateFile:
+		{
+			int virtAddr;
+			char* filename;
+			
+			virtAddr = machine->ReadRegister(4); 
+			filename = User2System(virtAddr, MaxFileLength + 1);
+
+			if (strlen(filename) == 0)
+			{
+				printf("\nFile name is not valid");
+				machine->WriteRegister(2, -1); 
+				delete[] filename;
+				break;
+			}
+
+			if (filename == NULL)  
+			{
+				printf("\n Not enough memory in system");
+				machine->WriteRegister(2, -1); 
+				delete[] filename;
+				break;
+			}
+
+			if (!fileSystem->Create(filename, 0)) 
+			{
+				printf("\nError create file '%s'", filename);
+				machine->WriteRegister(2, -1);
+				delete[] filename;
+				break;
+			}
+
+			printf("\nCreate file '%s' success", filename);
+			machine->WriteRegister(2, 0);
+			delete[] filename;
+			break;
+		}
 		
 
 		case SC_Add:
