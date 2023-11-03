@@ -15,6 +15,9 @@
 
 #include "copyright.h"
 #include "errno.h"
+
+/* define some constants for convenience */
+#define MaxFileLength 32
 /* system call codes -- used by the stubs to tell the kernel which system call
  * is being asked for
  */
