@@ -83,6 +83,23 @@ void ExceptionHandler(ExceptionType which)
 			ASSERTNOTREACHED();
 			break;
 		}
+
+		// case SC_Open:
+		// {
+		// 	int result;
+
+		// 	DEBUG(dbgSys, "\n SC_Open call ...");
+		// 	result = SysOpen((int)kernel->machine->ReadRegister(4), (int)kernel->machine->ReadRegister(5));
+
+		// 	DEBUG(dbgSys, "SysOpen returning with " << result << "\n");
+		// 	kernel->machine->WriteRegister(2, (int)result);
+
+		// 	IncreasePC();
+
+		// 	return;
+		// 	ASSERTNOTREACHED();
+		// 	break;
+		// }
 		
 		default:
 			cerr << "Unexpected system call " << type << "\n";

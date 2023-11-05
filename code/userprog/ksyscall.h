@@ -19,7 +19,6 @@ void SysHalt()
   kernel->interrupt->Halt();
 }
 
-
 char *User2System(int virtAddr, int limit)
 {
   int i; // index
@@ -50,7 +49,7 @@ int System2User(int virtAddr, int len, char *buffer)
     return -1;
   if (len == 0)
     return len;
-    
+
   int i = 0;
   int oneChar = 0;
 
@@ -76,42 +75,75 @@ void IncreasePC()
   kernel->machine->WriteRegister(NextPCReg, kernel->machine->ReadRegister(PCReg) + 4);
 }
 
-
 int SysCreate(int virtAddr)
 {
-  		DEBUG(dbgSys, "\n Reading virtual address of filename");
-			char *filename;
-			// Read virtual address of filename from register 4
-			virtAddr = kernel->machine->ReadRegister(4);
-  
-			DEBUG(dbgSys, "\n Reading filename.");
-			// MaxFileLength is 32
-      int result = 0;
-			filename = User2System(virtAddr, MaxFileLength + 1);
+  DEBUG(dbgSys, "\n Reading virtual address of filename");
+  char *filename;
+  // Read virtual address of filename from register 4
+  virtAddr = kernel->machine->ReadRegister(4);
 
-			if (filename == NULL)
-			{
-				DEBUG(dbgSys, "\n Filename is not valid");
-				result = -1;
-			}
-			else {
-				DEBUG(dbgSys, "\n Finish reading filename.");
-				DEBUG(dbgSys,"\n File name : '"<<filename<<"'");	
-        
-				// Create file with size = 0
-				if  (!kernel->fileSystem->Create(filename))
-				{
-					DEBUG(dbgSys, "\n Error create file '" << filename << "'");
-					result = -1;
-				}	
-				else
-				{
-					DEBUG(dbgSys, "\n Create file '" << filename << "' successfully");
-				}		
-			}
+  DEBUG(dbgSys, "\n Reading filename.");
+  // MaxFileLength is 32
+  int result = 0;
+  filename = User2System(virtAddr, MaxFileLength + 1);
 
-			delete[] filename;
-      return result;
+  if (filename == NULL)
+  {
+    DEBUG(dbgSys, "\n Filename is not valid");
+    result = -1;
+  }
+  else
+  {
+    DEBUG(dbgSys, "\n Finish reading filename.");
+    DEBUG(dbgSys, "\n File name : '" << filename << "'");
+
+    // Create file with size = 0
+    if (!kernel->fileSystem->Create(filename))
+    {
+      DEBUG(dbgSys, "\n Error create file '" << filename << "'");
+      result = -1;
+    }
+    else
+    {
+      DEBUG(dbgSys, "\n Create file '" << filename << "' successfully");
+    }
+  }
+
+  delete[] filename;
+  return result;
 }
+
+// int SysOpen(int virtAddr, int type)
+// {
+//   if (type != 0 && type != 1)
+//   {
+//     DEBUG(dbgSys, "\n Invalid type");
+//     return -1;
+//   }
+
+//   DEBUG(dbgSys, "\n Reading virtual address of filename");
+//   char *filename = User2System(virtAddr, MaxFileLength);
+
+//   if (filename == NULL || strlen(filename) == 0)
+//   {
+//     DEBUG(dbgSys, "\n Filename is not valid");
+//     return -1;
+//   }
+
+//   OpenFile *file = kernel->fileSystem->Open(filename);
+//   if (file == NULL)
+//   {
+//     DEBUG(dbgSys, "\n Error open file '" << filename << "'");
+//     return -1;
+//   }
+//   else
+//   {
+//     DEBUG(dbgSys, "\n Open file '" << filename << "' successfully");
+//     int id = kernel->currentThread->AddFile(file);
+//     return id;
+//   }
+
+//   delete[] filename;
+// }
 
 #endif /* ! __USERPROG_KSYSCALL_H__ */

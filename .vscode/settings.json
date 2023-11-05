@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "copyright.h": "c",
+        "iostream": "cpp"
+    }
+}
