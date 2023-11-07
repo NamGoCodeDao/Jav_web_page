@@ -84,23 +84,54 @@ void ExceptionHandler(ExceptionType which)
 			break;
 		}
 
-		// case SC_Open:
-		// {
-		// 	int result;
+		 case SC_Open:
+		 {
+		 	int result;
 
-		// 	DEBUG(dbgSys, "\n SC_Open call ...");
-		// 	result = SysOpen((int)kernel->machine->ReadRegister(4), (int)kernel->machine->ReadRegister(5));
+		 	DEBUG(dbgSys, "\n SC_Open call ...");
+		 	result = SysOpen((int)kernel->machine->ReadRegister(4), (int)kernel->machine->ReadRegister(5));
 
-		// 	DEBUG(dbgSys, "SysOpen returning with " << result << "\n");
-		// 	kernel->machine->WriteRegister(2, (int)result);
+		 	DEBUG(dbgSys, "SysOpen returning with " << result << "\n");
+		 	kernel->machine->WriteRegister(2, (int)result);
 
-		// 	IncreasePC();
+		 	IncreasePC();
 
-		// 	return;
-		// 	ASSERTNOTREACHED();
-		// 	break;
-		// }
-		
+		 	return ;
+		 	ASSERTNOTREACHED();
+		 	break;
+		 }
+			case SC_Close:
+			{
+				int result;
+
+				DEBUG(dbgSys, "\n SC_Close call ...");
+				result = SysClose((int)kernel->machine->ReadRegister(4));
+
+				DEBUG(dbgSys, "SysClose returning with " << result << "\n");
+				kernel->machine->WriteRegister(2, (int)result);
+
+				IncreasePC();
+
+				return ;
+				ASSERTNOTREACHED();
+				break;
+			}
+			case SC_Remove:
+			{
+				int result;
+
+				DEBUG(dbgSys, "\n SC_Remove call ...");
+				result = SysRemove((int)kernel->machine->ReadRegister(4));
+
+				DEBUG(dbgSys, "SysRemove returning with " << result << "\n");
+				kernel->machine->WriteRegister(2, (int)result);
+
+				IncreasePC();
+
+				return ;
+				ASSERTNOTREACHED();
+				break;
+			}
 		default:
 			cerr << "Unexpected system call " << type << "\n";
 			break;

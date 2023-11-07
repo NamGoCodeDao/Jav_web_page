@@ -10,10 +10,11 @@
 
 #ifndef __USERPROG_KSYSCALL_H__
 #define __USERPROG_KSYSCALL_H__
-
+//
 #include "kernel.h"
 #include "filesys.h"
-
+#include "FileDescriptors.h"
+Table table;
 void SysHalt()
 {
   kernel->interrupt->Halt();
@@ -113,37 +114,81 @@ int SysCreate(int virtAddr)
   return result;
 }
 
-// int SysOpen(int virtAddr, int type)
-// {
-//   if (type != 0 && type != 1)
-//   {
-//     DEBUG(dbgSys, "\n Invalid type");
-//     return -1;
-//   }
+ int SysOpen(int virtAddr, int type)
+ {
+   OpenFileID FileID;
+   if (type != 0 && type != 1)
+   {
+     DEBUG(dbgSys, "\n Invalid type");
+     return -1;
+   }
 
-//   DEBUG(dbgSys, "\n Reading virtual address of filename");
-//   char *filename = User2System(virtAddr, MaxFileLength);
+   DEBUG(dbgSys, "\n Reading virtual address of filename");
+   char *filename = User2System(virtAddr, MaxFileLength);
 
-//   if (filename == NULL || strlen(filename) == 0)
-//   {
-//     DEBUG(dbgSys, "\n Filename is not valid");
-//     return -1;
-//   }
+   if (filename == NULL || strlen(filename) == 0)
+   {
+     DEBUG(dbgSys, "\n Filename is not valid");
+     return -1;
+   }
 
-//   OpenFile *file = kernel->fileSystem->Open(filename);
-//   if (file == NULL)
-//   {
-//     DEBUG(dbgSys, "\n Error open file '" << filename << "'");
-//     return -1;
-//   }
-//   else
-//   {
-//     DEBUG(dbgSys, "\n Open file '" << filename << "' successfully");
-//     int id = kernel->currentThread->AddFile(file);
-//     return id;
-//   }
-
-//   delete[] filename;
-// }
-
+   FileID=table.Open(filename, type);
+   if (FileID == -1)
+   {
+     DEBUG(dbgSys, "\n Error open file '" << filename << "'");
+     return -1;
+   }
+   else
+   {
+     DEBUG(dbgSys, "\n Open file '" << filename << "' successfully");
+     return FileID;
+   }
+   delete[] filename;
+ }
+ int SysClose(OpenFileId  id)
+ {
+     if (table.Close(id) == -1)
+      {
+        DEBUG(dbgSys, "\n Error close file '" << id << "'");
+        return -1;
+      }
+      else
+      {
+          DEBUG(dbgSys, "\n Close file '" << id << "' successfully");
+          return 0;
+      }
+    return 0;
+ }
+int SysRemove(int virtAddr)
+{
+  int result=-1;
+  char *filename ;
+  filename= User2System(virtAddr, MaxFileLength);
+  DEBUG(dbgSys, "\n Reading virtual address of filename");
+  if (filename == NULL || strlen(filename) == 0)
+  {
+    DEBUG(dbgSys, "\n Filename is not valid");
+    result= -1;
+  }
+  if (table.IsOpeningWithName(filename)!=-1)
+  {
+    DEBUG(dbgSys, "\n File is opening");
+    result= -1;
+  }
+  else if(TRUE)
+  {
+    if (!kernel->fileSystem->Remove(filename))
+    {
+      DEBUG(dbgSys, "\n Error remove file '" << filename << "'");
+      result= -1;
+    }
+    else
+    {
+      DEBUG(dbgSys, "\n Remove file '" << filename << "' successfully");
+      result= 0;
+    }
+  }
+  delete[] filename;
+  return result;
+}
 #endif /* ! __USERPROG_KSYSCALL_H__ */
