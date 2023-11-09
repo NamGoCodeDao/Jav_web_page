@@ -75,7 +75,7 @@ void ExceptionHandler(ExceptionType which)
 			result = SysCreate((int)kernel->machine->ReadRegister(4));
 
 			DEBUG(dbgSys, "SysCreate returning with " << result << "\n");
-            kernel->machine->WriteRegister(2, (int)result);
+			kernel->machine->WriteRegister(2, (int)result);
 
 			IncreasePC();
 
@@ -84,54 +84,86 @@ void ExceptionHandler(ExceptionType which)
 			break;
 		}
 
-		 case SC_Open:
-		 {
-		 	int result;
+		case SC_Open:
+		{
+			int result;
 
-		 	DEBUG(dbgSys, "\n SC_Open call ...");
-		 	result = SysOpen((int)kernel->machine->ReadRegister(4), (int)kernel->machine->ReadRegister(5));
+			DEBUG(dbgSys, "\n SC_Open call ...");
+			result = SysOpen((int)kernel->machine->ReadRegister(4), (int)kernel->machine->ReadRegister(5));
 
-		 	DEBUG(dbgSys, "SysOpen returning with " << result << "\n");
-		 	kernel->machine->WriteRegister(2, (int)result);
+			DEBUG(dbgSys, "SysOpen returning with " << result << "\n");
+			kernel->machine->WriteRegister(2, (int)result);
 
-		 	IncreasePC();
+			IncreasePC();
 
-		 	return ;
-		 	ASSERTNOTREACHED();
-		 	break;
-		 }
-			case SC_Close:
-			{
-				int result;
+			return;
+			ASSERTNOTREACHED();
+			break;
+		}
+		case SC_Close:
+		{
+			int result;
 
-				DEBUG(dbgSys, "\n SC_Close call ...");
-				result = SysClose((int)kernel->machine->ReadRegister(4));
+			DEBUG(dbgSys, "\n SC_Close call ...");
+			result = SysClose((int)kernel->machine->ReadRegister(4));
 
-				DEBUG(dbgSys, "SysClose returning with " << result << "\n");
-				kernel->machine->WriteRegister(2, (int)result);
+			DEBUG(dbgSys, "SysClose returning with " << result << "\n");
+			kernel->machine->WriteRegister(2, (int)result);
 
-				IncreasePC();
+			IncreasePC();
 
-				return ;
-				ASSERTNOTREACHED();
-				break;
-			}
-			case SC_Remove:
-			{
-				int result;
+			return;
+			ASSERTNOTREACHED();
+			break;
+		}
+		case SC_Read:
+		{
+			int result;
 
-				DEBUG(dbgSys, "\n SC_Remove call ...");
-				result = SysRemove((int)kernel->machine->ReadRegister(4));
+			DEBUG(dbgSys, "\n SC_Read call ...");
+			result = SysRead((int)kernel->machine->ReadRegister(4), (int)kernel->machine->ReadRegister(5), (int)kernel->machine->ReadRegister(6));
 
-				DEBUG(dbgSys, "SysRemove returning with " << result << "\n");
-				kernel->machine->WriteRegister(2, (int)result);
+			DEBUG(dbgSys, "SysRead returning with " << result << "\n");
+			kernel->machine->WriteRegister(2, (int)result);
 
-				IncreasePC();
+			IncreasePC();
 
-				return ;
-				ASSERTNOTREACHED();
-				break;
-			}
+			return;
+			ASSERTNOTREACHED();
+			break;
+		}
+		case SC_Write:
+		{
+			int result;
+
+			DEBUG(dbgSys, "\n SC_Write call ...");
+			result = SysWrite((int)kernel->machine->ReadRegister(4), (int)kernel->machine->ReadRegister(5), (int)kernel->machine->ReadRegister(6));
+
+			DEBUG(dbgSys, "SysWrite returning with " << result << "\n");
+			kernel->machine->WriteRegister(2, (int)result);
+
+			IncreasePC();
+
+			return;
+			ASSERTNOTREACHED();
+			break;
+		}
+		case SC_Remove:
+		{
+			int result;
+
+			DEBUG(dbgSys, "\n SC_Remove call ...");
+			result = SysRemove((int)kernel->machine->ReadRegister(4));
+
+			DEBUG(dbgSys, "SysRemove returning with " << result << "\n");
+			kernel->machine->WriteRegister(2, (int)result);
+
+			IncreasePC();
+
+			return;
+			ASSERTNOTREACHED();
+			break;
+		}
 		default:
 			cerr << "Unexpected system call " << type << "\n";
 			break;

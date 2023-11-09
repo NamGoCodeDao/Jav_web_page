@@ -139,6 +139,14 @@ create.o: create.c
 create: create.o start.o
 	$(LD) $(LDFLAGS) start.o create.o -o create.coff
 	$(COFF2NOFF) create.coff create
+
+read.o: read.c
+	$(CC) $(CFLAGS) -c read.c
+	
+read: read.o start.o
+	$(LD) $(LDFLAGS) start.o read.o -o read.coff
+	$(COFF2NOFF) read.coff read
+
 open.o: open.c
 	$(CC) $(CFLAGS) -c open.c
 

@@ -2,10 +2,8 @@
 #include "kernel.h"
 #include "string.h"
 
-#define File_Mode 0
-#define Socket_Mode 1
-#define Stdin_Mode 2
-#define Stdout_Mode 3
+#define ReadWriteFile 0
+#define ReadFile 1
 
 typedef int OpenFileID ;
 
@@ -58,7 +56,7 @@ int FileDescriptor::Open_File(char* name,int type){
     }
     else{
         _name=name;
-        _mode=File_Mode;
+        _mode= type==0 ? ReadWriteFile : ReadFile;
         _id=_file->FileID();
         return _id;
     }
@@ -79,6 +77,19 @@ int FileDescriptor::Close_File(){
         return 1;
     }
 }
+
+int FileDescriptor::Read(char* buffer,int size){
+    return _file->Read(buffer,size);
+}
+int FileDescriptor::Write(char* buffer,int size){
+    if(_mode==ReadWriteFile)
+        return _file->Write(buffer,size);
+    else{
+        DEBUG(dbgSys, "\n Error: File is read-only");
+        return -1;
+    }
+}
+
 //=======================================================
 class Table{
 private:
@@ -93,6 +104,7 @@ public:
     int Close(OpenFileID id);
     OpenFileID Open(char* name,int type);
     void PrintOpeningFile();
+    FileDescriptor* GetFileDescriptor(OpenFileID id);
 };
 
 Table::Table(){
@@ -159,5 +171,17 @@ int Table::Close(OpenFileID id){
     {
         DEBUG(dbgSys, "\n Error: File is not opening");
         return -1;
+    }
+}
+
+FileDescriptor* Table::GetFileDescriptor(OpenFileID id){
+    int index=IsOpening(id);
+    if(index!=-1){
+        return &_table[index];
+    }
+    else
+    {
+        DEBUG(dbgSys, "\n Error: File is not opening");
+        return NULL;
     }
 }

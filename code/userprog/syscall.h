@@ -16,8 +16,6 @@
 #include "copyright.h"
 #include "errno.h"
 
-/* define some constants for convenience */
-#define MaxFileLength 32
 /* system call codes -- used by the stubs to tell the kernel which system call
  * is being asked for
  */
@@ -39,6 +37,11 @@
 #define SC_ThreadJoin   15
 
 #define SC_Add		42
+
+/* define some constants for convenience */
+#define MaxFileLength 32
+#define consoleInputID 0
+#define consoleOutputID 1
 
 #ifndef IN_ASM
 
@@ -107,9 +110,6 @@ typedef int OpenFileId;
  * Read and Write can be used directly on these, without first opening
  * the console device.
  */
-
-#define ConsoleInput	0  
-#define ConsoleOutput	1  
  
 /* Create a Nachos file, with name "name" */
 /* Note: Create does not open the file.   */
