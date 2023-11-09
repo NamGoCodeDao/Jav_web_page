@@ -37,7 +37,11 @@
 #define SC_ExecV	13
 #define SC_ThreadExit   14
 #define SC_ThreadJoin   15
-
+#define SC_SocketTCP       16
+#define SC_Connect     17
+#define SC_Send        18
+#define SC_Receive        19
+#define SC_CloseSocket        20
 #define SC_Add		42
 
 #ifndef IN_ASM
@@ -108,8 +112,8 @@ typedef int OpenFileId;
  * the console device.
  */
 
-#define ConsoleInput	0  
-#define ConsoleOutput	1  
+#define _ConsoleInput 0
+#define _ConsoleOutput 1
  
 /* Create a Nachos file, with name "name" */
 /* Note: Create does not open the file.   */
@@ -177,6 +181,27 @@ int ThreadJoin(ThreadId id);
  * Deletes current thread and returns ExitCode to every waiting lokal thread.
  */
 void ThreadExit(int ExitCode);	
+
+/*
+ * Creates a new socket and returns its ID.
+ */
+int SocketTCP();
+/*
+ * Connects to a socket with the given socket ID is opened and ip,port of server.
+ */
+int Connect(OpenFileId socketid, char *ip, int port);
+/*
+ * Sends a message to the socket with the given socket ID.
+ */
+int Send(OpenFileId socketid, char *buffer, int len);
+/*
+ * Receives a message from the socket with the given socket ID.
+ */
+int Receive(OpenFileId socketid, char *buffer, int len);
+/*
+ * Closes the socket with the given socket ID.
+ */
+int Close_Socket( OpenFileId socketid);
 
 #endif /* IN_ASM */
 

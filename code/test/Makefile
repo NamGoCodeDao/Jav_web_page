@@ -145,6 +145,12 @@ open.o: open.c
 open: open.o start.o
 	$(LD) $(LDFLAGS) start.o open.o -o open.coff
 	$(COFF2NOFF) open.coff open
+echoclient.o: echoclient.c
+	$(CC) $(CFLAGS) -c echoclient.c
+
+echoclient: echoclient.o start.o
+	$(LD) $(LDFLAGS) start.o echoclient.o -o echoclient.coff
+	$(COFF2NOFF) echoclient.coff echoclient
 shell.o: shell.c
 	$(CC) $(CFLAGS) -c shell.c
 shell: shell.o start.o
