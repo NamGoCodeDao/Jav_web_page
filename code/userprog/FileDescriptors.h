@@ -1,9 +1,17 @@
 #include"filesys.h"
 #include "kernel.h"
 #include "string.h"
+#include "post.h"
+#include "synchconsole.h"
+#include <arpa/inet.h>
+#include <stdio.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <unistd.h>
 
 #define ReadWriteFile 0
 #define ReadFile 1
+#define Socket_Mode 2
 
 typedef int OpenFileID ;
 
@@ -33,11 +41,22 @@ public:
     {
         return _name;
     }
+    //Function for File
     int Open_File(char* name,int type);
     int Close_File();
     int Read(char* buffer,int size);
     int Write(char* buffer,int size);
     int Seek(int pos);
+    //Function for Socket
+    int SocketTCP();
+    int Connect(int socketid,char* host,int port);
+//    3.	Cài đặt system call int Send(int socketid, char *buffer, int len), int Receive(int socketid, char *buffer, int len). Gửi và nhận dữ liệu từ socket.
+//    - Nếu thành công thì trả về số lượng bytes gửi đi hoặc nhận được
+//    - Nếu kết nối bị đóng trả về 0
+//    - Nếu thất bại trả về -1
+    int Send(int socketid,char* buffer,int len);
+    int Receive(int socketid,char* buffer,int len);
+    int Close_Socket();
 };
 FileDescriptor::FileDescriptor(){
     _mode=-1;
@@ -64,14 +83,12 @@ int FileDescriptor::Open_File(char* name,int type){
 int FileDescriptor::Close_File(){
     if(_id==-1)
         return -1;
-    else if(_file==NULL)
-        return -1;
     else
     {
         Close(_id);
         _mode=-1;
         _id=-1;
-        _file->~OpenFile();
+        //_file->~OpenFile();
         _file=NULL;
         _name=NULL;
         return 1;
@@ -90,6 +107,86 @@ int FileDescriptor::Write(char* buffer,int size){
     }
 }
 
+int FileDescriptor::SocketTCP(){
+    int socketid;
+    socketid=socket(AF_INET,SOCK_STREAM,0);
+    if(socketid<0){
+        DEBUG(dbgSys, "\n Error: Can not create socket");
+        return -1;
+    }
+    else
+    {
+        this->_mode=Socket_Mode;
+        this->_id=socketid;
+        this->_file=NULL;
+        this->_name=NULL;
+        return socketid;
+    }
+}
+int FileDescriptor::Connect(int socketid,char* host,int port){
+    struct sockaddr_in serverAddr;
+    serverAddr.sin_family=AF_INET;
+    serverAddr.sin_port=htons(port);
+    serverAddr.sin_addr.s_addr=inet_addr(host);
+    if(connect(socketid,(struct sockaddr*)&serverAddr,sizeof(serverAddr))<0){
+        DEBUG(dbgSys, "\n Error: Can not connect to server");
+        return -1;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+//void Send(PacketHeader pktHdr, MailHeader mailHdr, char *data);
+int FileDescriptor::Send(int socketid,char* buffer,int len){
+    //Thieu ====>>>>>Neu dong ket noi thi tra ve 0
+    //Set time out
+    struct timeval tv;
+    tv.tv_sec = 10;
+    tv.tv_usec = 0;
+    setsockopt(socketid, SOL_SOCKET, SO_SNDTIMEO, (char *)&tv,sizeof(struct timeval));
+    //Send data
+    int sent=send(socketid,buffer,len,0);
+    if(sent<0){
+        DEBUG(dbgSys, "\n Error: Can not send data");
+        return -1;
+    }
+    else
+    {
+        return sent;
+    }
+}
+int FileDescriptor::Receive(int socketid,char* buffer,int len){
+    //Thieu ====>>>>>Neu dong ket noi thi tra ve 0
+    //Set time out
+    struct timeval tv;
+    tv.tv_sec = 10;
+    tv.tv_usec = 0;
+    setsockopt(socketid, SOL_SOCKET, SO_RCVTIMEO, (char *)&tv,sizeof(struct timeval));
+    //Receive data
+    int received=recv(socketid,buffer,len,0);
+    if(received<0){
+        DEBUG(dbgSys, "\n Error: Can not receive data");
+        return -1;
+    }
+    else
+    {
+        DEBUG(dbgSys, "\n Received data: "<<buffer);
+        return received;
+    }
+}
+int FileDescriptor::Close_Socket(){
+    if(_id==-1)
+        return -1;
+    else
+    {
+         close(_id);
+        _mode=-1;
+        _id=-1;
+        return 1;
+    }
+}
 //=======================================================
 class Table{
 private:
@@ -105,6 +202,12 @@ public:
     OpenFileID Open(char* name,int type);
     void PrintOpeningFile();
     FileDescriptor* GetFileDescriptor(OpenFileID id);
+    int SocketTCP();
+    int Connect(int socketid,char* host,int port);
+    int Send(int socketid,char* buffer,int len);
+    int Receive(int socketid,char* buffer,int len);
+    int Close_Socket(int socketid);
+
 };
 
 Table::Table(){
@@ -135,12 +238,10 @@ OpenFileID Table::Open(char* name,int type){
     else{
         if(_table[slot].Open_File(name,type)==-1)
         {
-            DEBUG(dbgSys, "\n Error: Can not open file '" << name << "'");
             return -1;
         }
         else
         {
-            DEBUG(dbgSys, "\n Open file '" << name << "' successfully");
             return _table[slot].GetIdDescriptor();
         }
     }
@@ -162,10 +263,7 @@ int Table::IsOpeningWithName(char* name){
 int Table::Close(OpenFileID id){
     int index=IsOpening(id);
     if(index!=-1){
-        if (_table[index].Close_File()==-1)
-            return -1;
-        else
-            return 0;
+        return _table[index].Close_File();
     }
     else
     {
@@ -183,5 +281,59 @@ FileDescriptor* Table::GetFileDescriptor(OpenFileID id){
     {
         DEBUG(dbgSys, "\n Error: File is not opening");
         return NULL;
+    }
+}
+int Table::SocketTCP(){
+    int slot=FindFreeSlot();
+    if(slot==-1){
+        DEBUG(dbgSys, "\n Error: File table is full");
+        return -1;
+    }
+    else{
+        return _table[slot].SocketTCP();
+    }
+}
+int Table::Connect(int socketid,char* host,int port){
+    int index=IsOpening(socketid);
+    if(index!=-1){
+        return _table[index].Connect(socketid,host,port);
+    }
+    else
+    {
+        DEBUG(dbgSys, "\n Error: Socket is not opening");
+        return -1;
+    }
+}
+int Table::Send(int socketid,char* buffer,int len){
+    int index=IsOpening(socketid);
+    if(index!=-1){
+        return _table[index].Send(socketid,buffer,len);
+    }
+    else
+    {
+        DEBUG(dbgSys, "\n Error: Socket is not opening");
+        return -1;
+    }
+}
+int Table::Receive(int socketid,char* buffer,int len){
+    int index=IsOpening(socketid);
+    if(index!=-1){
+        return _table[index].Receive(socketid,buffer,len);
+    }
+    else
+    {
+        DEBUG(dbgSys, "\n Error: Socket is not opening");
+        return -1;
+    }
+}
+int Table::Close_Socket(int socketid){
+    int index=IsOpening(socketid);
+    if(index!=-1){
+        return _table[index].Close_Socket();
+    }
+    else
+    {
+        DEBUG(dbgSys, "\n Error: Socket is not opening");
+        return -1;
     }
 }

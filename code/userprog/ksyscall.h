@@ -115,52 +115,50 @@ int SysCreate(int virtAddr)
   return result;
 }
 
-int SysOpen(int virtAddr, int type)
-{
-  OpenFileID FileID;
-  if (type != 0 && type != 1)
-  {
-    DEBUG(dbgSys, "\n Invalid type");
-    return -1;
-  }
+ int SysOpen(int virtAddr, int type)
+ {
+   OpenFileID FileID;
+   if (type != 0 && type != 1)
+   {
+     DEBUG(dbgSys, "\n Invalid type");
+     return -1;
+   }
 
-  DEBUG(dbgSys, "\n Reading virtual address of filename");
-  char *filename = User2System(virtAddr, MaxFileLength);
+   DEBUG(dbgSys, "\n Reading virtual address of filename");
+   char *filename = User2System(virtAddr, MaxFileLength);
 
-  if (filename == NULL || strlen(filename) == 0)
-  {
-    DEBUG(dbgSys, "\n Filename is not valid");
-    return -1;
-  }
+   if (filename == NULL || strlen(filename) == 0)
+   {
+     DEBUG(dbgSys, "\n Filename is not valid");
+     return -1;
+   }
 
-  FileID = table.Open(filename, type);
-
-  if (FileID == -1)
-  {
-    DEBUG(dbgSys, "\n Error open file '" << filename << "'");
-    return -1;
-  }
-  else
-  {
-    DEBUG(dbgSys, "\n Open file '" << filename << "' successfully");
-    return FileID;
-  }
-  delete[] filename;
-}
-int SysClose(OpenFileId id)
-{
-  if (table.Close(id) == -1)
-  {
-    DEBUG(dbgSys, "\n Error close file '" << id << "'");
-    return -1;
-  }
-  else
-  {
-    DEBUG(dbgSys, "\n Close file '" << id << "' successfully");
-    return 0;
-  }
-  return 0;
-}
+   FileID=table.Open(filename, type);
+   if (FileID == -1)
+   {
+     DEBUG(dbgSys, "\n Error open file '" << filename << "'");
+     return -1;
+   }
+   else
+   {
+     DEBUG(dbgSys, "\n Open file '" << filename << "' successfully");
+     return FileID;
+   }
+   delete[] filename;
+ }
+ int SysClose(OpenFileId id)
+ {
+     if (table.Close(id) == -1)
+      {
+        DEBUG(dbgSys, "\n Error close file '" << id << "'");
+        return -1;
+      }
+      else
+      {
+          DEBUG(dbgSys, "\n Close file '" << id << "' successfully");
+          return 0;
+      }
+ }
 int SysRemove(int virtAddr)
 {
   int result = -1;
@@ -296,5 +294,66 @@ int SysWrite(int virtAddr, int size, OpenFileId id)
   System2User(virtAddr, size, buffer);
   delete[] buffer;
   return result;
+}
+int SysSocketTCP()
+{
+    int result = -1;
+    int id = table.SocketTCP();
+    if (id != -1)
+    {
+        result = id;
+    }
+    return result;
+}
+int SysConnect(int socketid, int ipvirtual, int port)
+{
+    int result = -1;
+    char *ip = User2System(ipvirtual, MaxFileLength);
+    if (ip==NULL or strlen(ip)==0)
+    {
+        DEBUG(dbgSys, "\n IP is not valid");
+        return result;
+    }
+    else
+    {
+        result = table.Connect(socketid, ip, port);
+    }
+    return result;
+}
+int SysSend(int socketid, int virtbuffer, int length)
+{
+    int result = -1;
+    char *buffer = User2System(virtbuffer, length);
+    if (buffer == NULL)
+    {
+        DEBUG(dbgSys, "\n Buffer is not valid");
+        return result;
+    }
+    else
+    {
+        result = table.Send(socketid, buffer, length);
+    }
+    return result;
+}
+int SysReceive(int socketid, int virtbuffer, int length)
+{
+    int result = -1;
+    char *buffer = User2System(virtbuffer, length);
+    if (buffer == NULL)
+    {
+        DEBUG(dbgSys, "\n Buffer is not valid");
+        return result;
+    }
+    else
+    {
+        result = table.Receive(socketid, buffer, length);
+    }
+    return result;
+}
+int SysCloseSocket(int socketid)
+{
+    int result = -1;
+    result = table.Close_Socket(socketid);
+    return result;
 }
 #endif /* ! __USERPROG_KSYSCALL_H__ */
