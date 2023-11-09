@@ -79,6 +79,79 @@ void ExceptionHandler(ExceptionType which)
 
 			ASSERTNOTREACHED();
 			break;
+		case SC_Connect:
+		{ //INPUT: int socketid(index), char *ip, int port
+			int socketid = kernel->machine->ReadRegister(4); // Lay socketid tu thanh ghi so 5
+			int virtAddr = kernel->machine->ReadRegister(5);  // Lay dia chi cua tham so ip tu thanh ghi so 4
+			int port = kernel->machine->ReadRegister(6);        // Lay port tu thanh ghi so 6
+			char* ip;
+			if (socketid < 2 || socketid >=20 )
+			{
+				printf("\nKhong the connect vi id nam ngoai bang mo ta file/socket.");
+				kernel->machine->WriteRegister(2, -1); // -1: Loi
+				IncreasePC();
+				return;
+				break;
+			}
+			if (kernel->fileSystem->openfile[socketid] == NULL)
+			{
+				printf("\nKhong the connect vi socket nay khong ton tai.");
+				kernel->machine->WriteRegister(2, -1);
+				IncreasePC();
+				return;
+				break;
+			}
+			ip = User2System(virtAddr, MAX_LENGTH_IP); 
+			if(kernel->fileSystem->openfile[socketid]->Connect(ip, port)<0){
+				cout << ip;
+				kernel->machine->WriteRegister(2, -1);
+			} else {
+				kernel->machine->WriteRegister(2, 0);
+			}
+			delete [] ip ;
+			IncreasePC();
+			return;
+			break;
+		}
+		case SC_Send:
+		{
+			int virtAddr = kernel->machine->ReadRegister(4);  // Lay dia chi cua tham so buffer tu thanh ghi so 4
+			int charcount = kernel->machine->ReadRegister(5); // Lay charcount tu thanh ghi so 5
+			int id = kernel->machine->ReadRegister(6);        // Lay id cua file tu thanh ghi so 6
+			int tempt;
+			char *buf;
+			if (id < 0 || id >= 20)
+			{
+				printf("\nKhong the send vi id nam ngoai bang mo ta file.");
+				kernel->machine->WriteRegister(2, -1);
+				IncreasePC();
+				return;
+			}
+			if (kernel->fileSystem->openfile[id] == NULL)
+			{
+				printf("\nKhong the send vi socket nay khong ton tai.");
+				kernel->machine->WriteRegister(2, -1);
+				IncreasePC();
+				return;
+			}
+			buf = User2System(virtAddr, charcount);// Copy chuoi tu vung nho User Space sang System Space voi bo dem buffer dai charcount
+			if (kernel->fileSystem->openfile[id]->type == 2 && kernel->fileSystem->openfile[id]->isConnect == true) {
+				tempt = kernel->fileSystem->openfile[id]->Write(buf, charcount);
+				if (tempt > 0) //Nếu số bytes viết ra lớn hơn 0
+				{
+				// So byte thuc su = NewPos - OldPos
+					kernel->machine->WriteRegister(2, tempt); // Viết bytes vào thanh ghi 2
+				} else {
+					kernel->machine->WriteRegister(2, -1);
+				}
+			} else {
+				kernel->machine->WriteRegister(2, -1);
+			}
+			delete buf;
+			IncreasePC();
+			return;
+
+		}
 		
 			case SC_Seek:
 		{
