@@ -132,14 +132,85 @@ void ExceptionHandler(ExceptionType which)
 				ASSERTNOTREACHED();
 				break;
 			}
-		default:
-			cerr << "Unexpected system call " << type << "\n";
+			case SC_SocketTCP:
+			{
+				int result;
+
+				DEBUG(dbgSys, "\n SC_SocketTCP call ...");
+				result = SysSocketTCP();
+
+				DEBUG(dbgSys, "SysSocketTCP returning with " << result << "\n");
+				kernel->machine->WriteRegister(2, (int)result);
+
+				IncreasePC();
+
+				return ;
+				ASSERTNOTREACHED();
+				break;
+			}
+			case SC_Connect:
+			{
+				int result;
+
+				DEBUG(dbgSys, "\n SC_Connect call ...");
+				result = SysConnect((int)kernel->machine->ReadRegister(4), (int)kernel->machine->ReadRegister(5),
+									(int)kernel->machine->ReadRegister(6));
+
+				DEBUG(dbgSys, "SysConnect returning with " << result << "\n");
+				kernel->machine->WriteRegister(2, (int)result);
+
+				IncreasePC();
+
+				return ;
+				ASSERTNOTREACHED();
+				break;
+			}
+			case SC_Send:
+			{
+				int result;
+				DEBUG(dbgSys, "\n SC_Send call ...");
+				result = SysSend((int)kernel->machine->ReadRegister(4), (int)kernel->machine->ReadRegister(5),
+								 (int)kernel->machine->ReadRegister(6));
+				DEBUG(dbgSys, "SysSend returning with " << result << "\n");
+				kernel->machine->WriteRegister(2, (int)result);
+
+				IncreasePC();
+				return ;
+				ASSERTNOTREACHED();
+				break;
+			}
+			case SC_Receive:
+			{
+				int result;
+				DEBUG(dbgSys, "\n SC_Receive call ...");
+				result = SysReceive((int)kernel->machine->ReadRegister(4), (int)kernel->machine->ReadRegister(5),
+									(int)kernel->machine->ReadRegister(6));
+				DEBUG(dbgSys, "SysReceive returning with " << result << "\n");
+				kernel->machine->WriteRegister(2, (int)result);
+				IncreasePC();
+				return ;
+				ASSERTNOTREACHED();
+				break;
+			}
+			case SC_CloseSocket:
+			{
+				int result;
+				DEBUG(dbgSys, "\n SC_CloseSocket call ...");
+				result = SysCloseSocket((int)kernel->machine->ReadRegister(4));
+				DEBUG(dbgSys, "SysCloseSocket returning with " << result << "\n");
+				kernel->machine->WriteRegister(2, (int)result);
+				IncreasePC();
+				return ;
+				ASSERTNOTREACHED();
+				break;
+			}
+			default:
+				cerr << "Unexpected system call " << type << "\n";
+				break;
+			}
 			break;
-		}
-		break;
 	default:
 		cerr << "Unexpected user mode exception" << (int)which << "\n";
 		break;
 	}
-	ASSERTNOTREACHED();
 }
