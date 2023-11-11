@@ -8,6 +8,7 @@ int main()
     // char buffer[maxlen];
     // int i, size;
     /*Create a file*/
+    int a = Create("a.txt");
     int fileID = Open("text.txt", 1);
     int fileID2 = Open("text2.txt", 0);
     int temp=Close(fileID2);

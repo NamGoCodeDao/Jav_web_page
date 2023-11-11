@@ -16,8 +16,6 @@
 #include "copyright.h"
 #include "errno.h"
 
-/* define some constants for convenience */
-#define MaxFileLength 32
 /* system call codes -- used by the stubs to tell the kernel which system call
  * is being asked for
  */
@@ -43,6 +41,11 @@
 #define SC_Receive        19
 #define SC_CloseSocket        20
 #define SC_Add		42
+
+/* define some constants for convenience */
+#define MaxFileLength 32
+#define consoleInputID 0
+#define consoleOutputID 1
 
 #ifndef IN_ASM
 
