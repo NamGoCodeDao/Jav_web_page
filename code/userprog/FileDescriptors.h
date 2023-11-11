@@ -46,7 +46,7 @@ public:
     int Close_File();
     int Read(char* buffer,int size);
     int Write(char* buffer,int size);
-    int Seek(int pos);
+    int Seek(int position);
     //Function for Socket
     int SocketTCP();
     int Connect(int socketid,char* host,int port);
@@ -68,6 +68,19 @@ FileDescriptor::~FileDescriptor(){
     _mode=-1;
     _id=-1;
 }
+
+int FileDescriptor::Seek(int position){
+
+    if (position >= _file->Length())
+        return -1;
+
+    if (position == -1)
+        return _file->Seek(_file->Length());
+
+    return _file->Seek(position);
+
+}
+
 int FileDescriptor::Open_File(char* name,int type){
     _file=kernel->fileSystem->Open(name,type);
     if(_file==NULL){
