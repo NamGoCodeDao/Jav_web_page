@@ -48,279 +48,189 @@
 //	is in machine.h.
 //----------------------------------------------------------------------
 
-void ExceptionHandler(ExceptionType which)
-{
-	int type = kernel->machine->ReadRegister(2);
+void ExceptionHandler(ExceptionType which) {
+    int type = kernel->machine->ReadRegister(2);
 
-	DEBUG(dbgSys, "Received Exception " << which << " type: " << type << "\n");
+    DEBUG(dbgSys, "Received Exception " << which << " type: " << type << "\n");
 
-	switch (which)
-	{
-	case SyscallException:
-		switch (type)
-		{
-		case SC_Halt:
-			DEBUG(dbgSys, "Shutdown, initiated by user program.\n");
+    switch (which) {
+        case SyscallException:
+            switch (type) {
+                case SC_Halt:
+                    DEBUG(dbgSys, "Shutdown, initiated by user program.\n");
 
-			SysHalt();
+                    SysHalt();
 
-			ASSERTNOTREACHED();
-			break;
+                    ASSERTNOTREACHED();
+                    break;
 
-		case SC_Create:
-		{
-			int result;
+                case SC_Create: {
+                    int result;
 
-			DEBUG(dbgSys, "\n SC_Create call ...");
-			result = SysCreate((int)kernel->machine->ReadRegister(4));
+                    DEBUG(dbgSys, "\n SC_Create call ...");
+                    result = SysCreate((int) kernel->machine->ReadRegister(4));
 
-			DEBUG(dbgSys, "SysCreate returning with " << result << "\n");
-			kernel->machine->WriteRegister(2, (int)result);
+                    DEBUG(dbgSys, "SysCreate returning with " << result << "\n");
+                    kernel->machine->WriteRegister(2, (int) result);
 
-			IncreasePC();
+                    IncreasePC();
 
-			return;
-			ASSERTNOTREACHED();
-			break;
-		}
+                    return;
+                    ASSERTNOTREACHED();
+                    break;
+                }
 
-		case SC_Open:
-		{
-			int result;
+                case SC_Open: {
+                    int result;
 
-			DEBUG(dbgSys, "\n SC_Open call ...");
-			result = SysOpen((int)kernel->machine->ReadRegister(4), (int)kernel->machine->ReadRegister(5));
+                    DEBUG(dbgSys, "\n SC_Open call ...");
+                    result = SysOpen((int) kernel->machine->ReadRegister(4), (int) kernel->machine->ReadRegister(5));
 
-			DEBUG(dbgSys, "SysOpen returning with " << result << "\n");
-			kernel->machine->WriteRegister(2, (int)result);
+                    DEBUG(dbgSys, "SysOpen returning with " << result << "\n");
+                    kernel->machine->WriteRegister(2, (int) result);
 
-			IncreasePC();
+                    IncreasePC();
 
-			return;
-			ASSERTNOTREACHED();
-			break;
-		}
-		case SC_Close:
-		{
-			int result;
+                    return;
+                    ASSERTNOTREACHED();
+                    break;
+                }
+                case SC_Close: {
+                    int result;
 
-			DEBUG(dbgSys, "\n SC_Close call ...");
-			result = SysClose((int)kernel->machine->ReadRegister(4));
+                    DEBUG(dbgSys, "\n SC_Close call ...");
+                    result = SysClose((int) kernel->machine->ReadRegister(4));
 
-			DEBUG(dbgSys, "SysClose returning with " << result << "\n");
-			kernel->machine->WriteRegister(2, (int)result);
+                    DEBUG(dbgSys, "SysClose returning with " << result << "\n");
+                    kernel->machine->WriteRegister(2, (int) result);
 
-			IncreasePC();
+                    IncreasePC();
 
-			return;
-			ASSERTNOTREACHED();
-			break;
-		}
-		case SC_Read:
-		{
-			int result;
+                    return;
+                    ASSERTNOTREACHED();
+                    break;
+                }
+                case SC_Read: {
+                    int result;
 
-			DEBUG(dbgSys, "\n SC_Read call ...");
-			result = SysRead((int)kernel->machine->ReadRegister(4), (int)kernel->machine->ReadRegister(5), (int)kernel->machine->ReadRegister(6));
+                    DEBUG(dbgSys, "\n SC_Read call ...");
+                    result = SysRead((int) kernel->machine->ReadRegister(4), (int) kernel->machine->ReadRegister(5),
+                                     (int) kernel->machine->ReadRegister(6));
 
-			DEBUG(dbgSys, "SysRead returning with " << result << "\n");
-			kernel->machine->WriteRegister(2, (int)result);
+                    DEBUG(dbgSys, "SysRead returning with " << result << "\n");
+                    kernel->machine->WriteRegister(2, (int) result);
 
-			IncreasePC();
+                    IncreasePC();
 
-			return;
-			ASSERTNOTREACHED();
-			break;
-		}
-		case SC_Write:
-		{
-			int result;
+                    return;
+                    ASSERTNOTREACHED();
+                    break;
+                }
+                case SC_Write: {
+                    int result;
 
-			DEBUG(dbgSys, "\n SC_Write call ...");
-			result = SysWrite((int)kernel->machine->ReadRegister(4), (int)kernel->machine->ReadRegister(5), (int)kernel->machine->ReadRegister(6));
+                    DEBUG(dbgSys, "\n SC_Write call ...");
+                    result = SysWrite((int) kernel->machine->ReadRegister(4), (int) kernel->machine->ReadRegister(5),
+                                      (int) kernel->machine->ReadRegister(6));
 
-			DEBUG(dbgSys, "SysWrite returning with " << result << "\n");
-			kernel->machine->WriteRegister(2, (int)result);
+                    DEBUG(dbgSys, "SysWrite returning with " << result << "\n");
+                    kernel->machine->WriteRegister(2, (int) result);
 
-			IncreasePC();
+                    IncreasePC();
 
-			return;
-			ASSERTNOTREACHED();
-			break;
-		}
-		case SC_Remove:
-		{
-			int result;
+                    return;
+                    ASSERTNOTREACHED();
+                    break;
+                }
+                case SC_Remove: {
+                    int result;
 
-			DEBUG(dbgSys, "\n SC_Remove call ...");
-			result = SysRemove((int)kernel->machine->ReadRegister(4));
+                    DEBUG(dbgSys, "\n SC_Remove call ...");
+                    result = SysRemove((int) kernel->machine->ReadRegister(4));
 
-			DEBUG(dbgSys, "SysRemove returning with " << result << "\n");
-			kernel->machine->WriteRegister(2, (int)result);
+                    DEBUG(dbgSys, "SysRemove returning with " << result << "\n");
+                    kernel->machine->WriteRegister(2, (int) result);
 
-			IncreasePC();
+                    IncreasePC();
 
-				return ;
-				ASSERTNOTREACHED();
-				break;
-			}
-			case SC_SocketTCP:
-			{
-				int result;
+                    return;
+                    ASSERTNOTREACHED();
+                    break;
+                }
+                case SC_SocketTCP: {
+                    int result;
 
-				DEBUG(dbgSys, "\n SC_SocketTCP call ...");
-				result = SysSocketTCP();
+                    DEBUG(dbgSys, "\n SC_SocketTCP call ...");
+                    result = SysSocketTCP();
 
-				DEBUG(dbgSys, "SysSocketTCP returning with " << result << "\n");
-				kernel->machine->WriteRegister(2, (int)result);
+                    DEBUG(dbgSys, "SysSocketTCP returning with " << result << "\n");
+                    kernel->machine->WriteRegister(2, (int) result);
 
-				IncreasePC();
+                    IncreasePC();
 
-				return ;
-				ASSERTNOTREACHED();
-				break;
-			}
-			case SC_Connect:
-			{
-				int result;
+                    return;
+                    ASSERTNOTREACHED();
+                    break;
+                }
+                case SC_Connect: {
+                    int result;
 
-				DEBUG(dbgSys, "\n SC_Connect call ...");
-				result = SysConnect((int)kernel->machine->ReadRegister(4), (int)kernel->machine->ReadRegister(5),
-									(int)kernel->machine->ReadRegister(6));
+                    DEBUG(dbgSys, "\n SC_Connect call ...");
+                    result = SysConnect((int) kernel->machine->ReadRegister(4), (int) kernel->machine->ReadRegister(5),
+                                        (int) kernel->machine->ReadRegister(6));
 
-				DEBUG(dbgSys, "SysConnect returning with " << result << "\n");
-				kernel->machine->WriteRegister(2, (int)result);
+                    DEBUG(dbgSys, "SysConnect returning with " << result << "\n");
+                    kernel->machine->WriteRegister(2, (int) result);
 
-				IncreasePC();
+                    IncreasePC();
 
-				return ;
-				ASSERTNOTREACHED();
-				break;
-			}
-			case SC_Send:
-			{
-				int result;
-				DEBUG(dbgSys, "\n SC_Send call ...");
-				result = SysSend((int)kernel->machine->ReadRegister(4), (int)kernel->machine->ReadRegister(5),
-								 (int)kernel->machine->ReadRegister(6));
-				DEBUG(dbgSys, "SysSend returning with " << result << "\n");
-				kernel->machine->WriteRegister(2, (int)result);
+                    return;
+                    ASSERTNOTREACHED();
+                    break;
+                }
+                case SC_Send: {
+                    int result;
+                    DEBUG(dbgSys, "\n SC_Send call ...");
+                    result = SysSend((int) kernel->machine->ReadRegister(4), (int) kernel->machine->ReadRegister(5),
+                                     (int) kernel->machine->ReadRegister(6));
+                    DEBUG(dbgSys, "SysSend returning with " << result << "\n");
+                    kernel->machine->WriteRegister(2, (int) result);
 
-				IncreasePC();
-				return ;
-				ASSERTNOTREACHED();
-				break;
-			}
-			case SC_Receive:
-			{
-				int result;
-				DEBUG(dbgSys, "\n SC_Receive call ...");
-				result = SysReceive((int)kernel->machine->ReadRegister(4), (int)kernel->machine->ReadRegister(5),
-									(int)kernel->machine->ReadRegister(6));
-				DEBUG(dbgSys, "SysReceive returning with " << result << "\n");
-				kernel->machine->WriteRegister(2, (int)result);
-				IncreasePC();
-				return ;
-				ASSERTNOTREACHED();
-				break;
-			}
-			case SC_CloseSocket:
-			{
-				int result;
-				DEBUG(dbgSys, "\n SC_CloseSocket call ...");
-				result = SysCloseSocket((int)kernel->machine->ReadRegister(4));
-				DEBUG(dbgSys, "SysCloseSocket returning with " << result << "\n");
-				kernel->machine->WriteRegister(2, (int)result);
-				IncreasePC();
-				return ;
-				ASSERTNOTREACHED();
-				break;
-			}
-			default:
-				cerr << "Unexpected system call " << type << "\n";
-				break;
-			}
-			return;
-			ASSERTNOTREACHED();
-			break;
-		}
-		case SC_SocketTCP:
-		{
-			int result;
-
-			DEBUG(dbgSys, "\n SC_SocketTCP call ...");
-			result = SysSocketTCP();
-
-			DEBUG(dbgSys, "SysSocketTCP returning with " << result << "\n");
-			kernel->machine->WriteRegister(2, (int)result);
-
-			IncreasePC();
-
-			return;
-			ASSERTNOTREACHED();
-			break;
-		}
-		case SC_Connect:
-		{
-			int result;
-
-			DEBUG(dbgSys, "\n SC_Connect call ...");
-			result = SysConnect((int)kernel->machine->ReadRegister(4), (int)kernel->machine->ReadRegister(5),
-								(int)kernel->machine->ReadRegister(6));
-
-			DEBUG(dbgSys, "SysConnect returning with " << result << "\n");
-			kernel->machine->WriteRegister(2, (int)result);
-
-			IncreasePC();
-
-			return;
-			ASSERTNOTREACHED();
-			break;
-		}
-		case SC_Send:
-		{
-			int result;
-			DEBUG(dbgSys, "\n SC_Send call ...");
-			result = SysSend((int)kernel->machine->ReadRegister(4), (int)kernel->machine->ReadRegister(5),
-							 (int)kernel->machine->ReadRegister(6));
-			DEBUG(dbgSys, "SysSend returning with " << result << "\n");
-			kernel->machine->WriteRegister(2, (int)result);
-
-			IncreasePC();
-			return;
-			ASSERTNOTREACHED();
-			break;
-		}
-		case SC_Receive:
-		{
-			int result;
-			DEBUG(dbgSys, "\n SC_Receive call ...");
-			result = SysReceive((int)kernel->machine->ReadRegister(4), (int)kernel->machine->ReadRegister(5),
-								(int)kernel->machine->ReadRegister(6));
-			DEBUG(dbgSys, "SysReceive returning with " << result << "\n");
-			kernel->machine->WriteRegister(2, (int)result);
-			IncreasePC();
-			return;
-			ASSERTNOTREACHED();
-			break;
-		}
-		case SC_CloseSocket:
-		{
-			int result;
-			DEBUG(dbgSys, "\n SC_CloseSocket call ...");
-			result = SysCloseSocket((int)kernel->machine->ReadRegister(4));
-			DEBUG(dbgSys, "SysCloseSocket returning with " << result << "\n");
-			kernel->machine->WriteRegister(2, (int)result);
-			IncreasePC();
-			return;
-			ASSERTNOTREACHED();
-			break;
-		}
-		default:
-			cerr << "Unexpected system call " << type << "\n";
-			break;
-	default:
-		cerr << "Unexpected user mode exception" << (int)which << "\n";
-		break;
-	}
+                    IncreasePC();
+                    return;
+                    ASSERTNOTREACHED();
+                    break;
+                }
+                case SC_Receive: {
+                    int result;
+                    DEBUG(dbgSys, "\n SC_Receive call ...");
+                    result = SysReceive((int) kernel->machine->ReadRegister(4), (int) kernel->machine->ReadRegister(5),
+                                        (int) kernel->machine->ReadRegister(6));
+                    DEBUG(dbgSys, "SysReceive returning with " << result << "\n");
+                    kernel->machine->WriteRegister(2, (int) result);
+                    IncreasePC();
+                    return;
+                    ASSERTNOTREACHED();
+                    break;
+                }
+                case SC_CloseSocket: {
+                    int result;
+                    DEBUG(dbgSys, "\n SC_CloseSocket call ...");
+                    result = SysCloseSocket((int) kernel->machine->ReadRegister(4));
+                    DEBUG(dbgSys, "SysCloseSocket returning with " << result << "\n");
+                    kernel->machine->WriteRegister(2, (int) result);
+                    IncreasePC();
+                    return;
+                    ASSERTNOTREACHED();
+                    break;
+                }
+                default:
+                    cerr << "Unexpected system call " << type << "\n";
+                    break;
+            }
+            break;
+                default:
+                    cerr << "Unexpected user mode exception" << (int) which << "\n";
+                    break;
+            }
 }

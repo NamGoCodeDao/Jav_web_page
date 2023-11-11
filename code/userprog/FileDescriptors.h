@@ -151,6 +151,9 @@ int FileDescriptor::Send(int socketid,char* buffer,int len){
         DEBUG(dbgSys, "\n Error: Can not send data");
         return -1;
     }
+    if(strcmp(buffer,"exit")==0){
+        return 0;
+    }
     else
     {
         return sent;
@@ -168,6 +171,9 @@ int FileDescriptor::Receive(int socketid,char* buffer,int len){
     if(received<0){
         DEBUG(dbgSys, "\n Error: Can not receive data");
         return -1;
+    }
+    if(strcmp(buffer,"exit")==0){
+        return 0;
     }
     else
     {

@@ -140,6 +140,30 @@ create: create.o start.o
 	$(LD) $(LDFLAGS) start.o create.o -o create.coff
 	$(COFF2NOFF) create.coff create
 
+createfile.o: createfile.c
+	$(CC) $(CFLAGS) -c createfile.c
+
+createfile: createfile.o start.o
+	$(LD) $(LDFLAGS) start.o createfile.o -o createfile.coff
+	$(COFF2NOFF) createfile.coff createfile
+cat.o: cat.c
+	$(CC) $(CFLAGS) -c cat.c
+
+cat: cat.o start.o
+	$(LD) $(LDFLAGS) start.o cat.o -o cat.coff
+	$(COFF2NOFF) cat.coff cat
+delete.o: delete.c
+	$(CC) $(CFLAGS) -c delete.c
+
+delete: delete.o start.o
+	$(LD) $(LDFLAGS) start.o delete.o -o delete.coff
+	$(COFF2NOFF) delete.coff delete
+copy.o: copy.c
+	$(CC) $(CFLAGS) -c copy.c
+
+copy: copy.o start.o
+	$(LD) $(LDFLAGS) start.o copy.o -o copy.coff
+	$(COFF2NOFF) copy.coff copy
 read.o: read.c
 	$(CC) $(CFLAGS) -c read.c
 	
@@ -159,6 +183,13 @@ echoclient.o: echoclient.c
 echoclient: echoclient.o start.o
 	$(LD) $(LDFLAGS) start.o echoclient.o -o echoclient.coff
 	$(COFF2NOFF) echoclient.coff echoclient
+fileclient.o: fileclient.c
+	$(CC) $(CFLAGS) -c fileclient.c
+
+fileclient: fileclient.o start.o
+	$(LD) $(LDFLAGS) start.o fileclient.o -o fileclient.coff
+	$(COFF2NOFF) fileclient.coff fileclient
+
 shell.o: shell.c
 	$(CC) $(CFLAGS) -c shell.c
 shell: shell.o start.o

@@ -9,16 +9,14 @@ def handle_client(client_socket, address):
     while True:
         data = client_socket.recv(max_length).decode()
 
-        if not data:
-            break
-
-        if data == "Close":
+        if data == "exit":
             print(f"Closing connection with {address}")
             client_socket.close()
             break
 
         print(f"Received from {address}: {data}")
         response = data.upper()
+        print(response)
         client_socket.send(response.encode())
 
 # Tạo socket server
@@ -35,3 +33,8 @@ while True:
     client_socket, client_address = server.accept()
     client_thread = threading.Thread(target=handle_client, args=(client_socket, client_address))
     client_thread.start()
+
+
+
+
+

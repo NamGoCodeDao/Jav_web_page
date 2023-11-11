@@ -347,7 +347,10 @@ int SysReceive(int socketid, int virtbuffer, int length)
     else
     {
         result = table.Receive(socketid, buffer, length);
+        //Send buffer to user space
+        System2User(virtbuffer, length, buffer);
     }
+    //Delete buffer
     return result;
 }
 int SysCloseSocket(int socketid)
