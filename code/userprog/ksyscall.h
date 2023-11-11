@@ -115,6 +115,30 @@ int SysCreate(int virtAddr)
   return result;
 }
 
+int SysSeek(int pos, OpenFileId id)
+{
+  if (id < 0)
+  {
+    DEBUG(dbgSys, "\n Invalid file descriptor");
+    return -1;
+  }
+  else if(id==consoleOutputID){
+    DEBUG(dbgSys, "\n Error: Can not seek console output");
+    return -1;
+  }
+  else if(id==consoleInputID){
+    DEBUG(dbgSys, "\n Error: Can not seek console input");
+    return -1;
+  }
+  else if(!table.IsOpening(id))
+  {
+    DEBUG(dbgSys, "\n Error: File is not opening");
+    return -1;
+  }
+    DEBUG(dbgSys, "\n Seek file");
+    return table.GetFileDescriptor(id)->Seek(pos);
+}
+
  int SysOpen(int virtAddr, int type)
  {
    OpenFileID FileID;

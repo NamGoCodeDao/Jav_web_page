@@ -133,6 +133,13 @@ add: add.o start.o
 	$(LD) $(LDFLAGS) start.o add.o -o add.coff
 	$(COFF2NOFF) add.coff add
 
+seek.o: seek.c
+	$(CC) $(CFLAGS) -c seek.c
+
+seek: seek.o start.o
+	$(LD) $(LDFLAGS) start.o seek.o -o seek.coff
+	$(COFF2NOFF) seek.coff seek
+
 create.o: create.c
 	$(CC) $(CFLAGS) -c create.c
 
