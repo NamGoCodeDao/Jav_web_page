@@ -1,3 +1,4 @@
 #!/bin/bash
-rm server
+rm -f server
 gcc -o server server.c
+./server

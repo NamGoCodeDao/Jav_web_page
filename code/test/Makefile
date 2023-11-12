@@ -177,7 +177,12 @@ read.o: read.c
 read: read.o start.o
 	$(LD) $(LDFLAGS) start.o read.o -o read.coff
 	$(COFF2NOFF) read.coff read
+concatenate.o: concatenate.c
+	$(CC) $(CFLAGS) -c concatenate.c
 
+concatenate: concatenate.o start.o
+	$(LD) $(LDFLAGS) start.o concatenate.o -o concatenate.coff
+	$(COFF2NOFF) concatenate.coff concatenate
 open.o: open.c
 	$(CC) $(CFLAGS) -c open.c
 

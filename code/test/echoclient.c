@@ -6,7 +6,7 @@
 int main()
 {
 
-    const int numSocket=5;  //Last socket is used to close server
+    const int numSocket=4;
     int socketid[numSocket];
     char *messagesend[5];
     char *messagerecv[5];
@@ -25,12 +25,6 @@ int main()
         //Connect to server
         Connect(socketid[iter], "127.0.0.1", 1234);
 
-        if(iter==numSocket-1) {
-            Send(socketid[iter],"exit",100);
-            Write("Closed server\n",50,consoleOutputID);
-            Close(socketid[iter]);
-            break;
-        }
         //Read message from console to send to server
         Write("Input message of socket:",50,consoleOutputID);
         Read(messagesend[iter],maxlenmasage,consoleInputID);
@@ -38,6 +32,12 @@ int main()
         //Send message to server
         Send(socketid[iter],messagesend[iter],100);
 
+        if (messagesend[iter][0]=='e' && messagesend[iter][1]=='x'
+        && messagesend[iter][2]=='i' && messagesend[iter][3]=='t')
+        {
+            Write("Client exit\n",50,consoleOutputID);
+            break;
+        }
         //Receive message from server
         Receive(socketid[iter],messagerecv[iter],maxlenmasage);
 
@@ -50,9 +50,6 @@ int main()
         Close(socketid[iter]);
         iter++;
     }
-    //Send message to close server
-
-
     Halt();
     return 0;
 }

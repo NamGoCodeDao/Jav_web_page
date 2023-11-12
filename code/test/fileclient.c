@@ -74,15 +74,6 @@ int main(int argc, char** argv)
     Close(fileID2);
 
     Write("Gui nhan du lieu thanh cong\n", 100, consoleOutputID);
-
-    socketclose= SocketTCP();
-    connectID = Connect(socketclose, "127.0.0.1",1234);
-    Send(socketclose,"exit",100);
-    Receive(socketclose,bufferclose,100);
-    Close(socketclose);
-
-    Write("Ngat ket noi thanh cong\n", 100, consoleOutputID);
-
     Halt();
     return 0;
 }

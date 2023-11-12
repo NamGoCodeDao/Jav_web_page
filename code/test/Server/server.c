@@ -57,9 +57,16 @@ int main(int argc, char const *argv[]) {
         }
         if (strcmp(buffer, "exit") == 0) {
             printf("Client %s:%d disconnected\n", client_ip, ntohs(client.sin_port));
+            printf("Do you want to close the server? (y/n): ");
+            char c;
+            scanf("%c", &c);
+            if (c == 'y') {
+                close(serverFd);
+                printf("Server closed\n");
+                break;
+            }
+            continue;
             close(clientFd);
-            close(serverFd);
-            break;
         }
 
         printf("received %s from client\n", buffer);
