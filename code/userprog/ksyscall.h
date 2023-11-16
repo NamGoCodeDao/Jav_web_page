@@ -81,15 +81,13 @@ int SysCreate(int virtAddr)
 {
   DEBUG(dbgSys, "\n Reading virtual address of filename");
   char *filename;
-  // Read virtual address of filename from register 4
-  virtAddr = kernel->machine->ReadRegister(4);
 
   DEBUG(dbgSys, "\n Reading filename.");
   // MaxFileLength is 32
   int result = 0;
   filename = User2System(virtAddr, MaxFileLength + 1);
 
-  if (filename == NULL)
+  if (filename == NULL || strlen(filename) == 0)
   {
     DEBUG(dbgSys, "\n Filename is not valid");
     result = -1;
