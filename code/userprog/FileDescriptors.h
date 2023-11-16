@@ -50,10 +50,6 @@ public:
     //Function for Socket
     int SocketTCP();
     int Connect(int socketid,char* host,int port);
-//    3.	Cài đặt system call int Send(int socketid, char *buffer, int len), int Receive(int socketid, char *buffer, int len). Gửi và nhận dữ liệu từ socket.
-//    - Nếu thành công thì trả về số lượng bytes gửi đi hoặc nhận được
-//    - Nếu kết nối bị đóng trả về 0
-//    - Nếu thất bại trả về -1
     int Send(int socketid,char* buffer,int len);
     int Receive(int socketid,char* buffer,int len);
     int Close_Socket();
